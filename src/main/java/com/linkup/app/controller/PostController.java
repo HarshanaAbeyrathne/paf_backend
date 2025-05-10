@@ -1,5 +1,6 @@
 package com.linkup.app.controller;
 
+import com.linkup.app.dto.PostResponse;
 import com.linkup.app.dto.UpdatePostRequest;
 import com.linkup.app.model.Post;
 import com.linkup.app.model.User;
@@ -94,9 +95,9 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
         try {
-            List<Post> posts = postService.getAllPosts();
+            List<PostResponse> posts = postService.getAllPosts();
             logger.info("Retrieved " + posts.size() + " posts");
             return ResponseEntity.ok(posts);
         } catch (Exception e) {

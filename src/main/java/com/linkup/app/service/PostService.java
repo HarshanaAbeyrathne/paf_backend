@@ -1,5 +1,8 @@
 package com.linkup.app.service;
 
+import com.linkup.app.dto.CommentResponse;
+import com.linkup.app.dto.PostResponse;
+import com.linkup.app.model.Comment;
 import com.linkup.app.model.Content;
 import com.linkup.app.model.Post;
 import com.linkup.app.model.User;
@@ -84,8 +87,44 @@ public class PostService {
         return postRepository.findByUserUserIdOrderByPostIdDesc(userId);
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAllByOrderByPostIdDesc();
+    public List<PostResponse> getAllPosts() {
+        List<Post> posts = postRepository.findAllByOrderByPostIdDesc();
+        List<PostResponse> postResponses = new ArrayList<>();
+        for (Post post : posts) {
+            PostResponse postResponse = new PostResponse();
+
+            postResponse.setPostId(post.getPostId());
+            postResponse.setDescription(post.getDescription());
+            postResponse.setPostType(post.getPostType());
+            postResponse.setCreatedAt(post.getCreatedAt());
+
+            // User Info
+            if (post.getUser() != null) {
+                postResponse.setUserId(post.getUser().getUserId());
+                postResponse.setUserName(post.getUser().getUserName());
+            }
+            // Contents
+            postResponse.setContents(post.getContents());
+            // Comments & Likes Count
+            postResponse.setCommentsCount(post.getComments().size());
+            List<CommentResponse> commentResponses = new ArrayList<>();
+            for (Comment comment : post.getComments()) {
+                CommentResponse commentResponse = new CommentResponse();
+                commentResponse.setCommentId(comment.getCommentId());
+                commentResponse.setCreatedAt(comment.getCreatedAt());
+                commentResponse.setPostId(comment.getPost().getPostId());
+                commentResponse.setContent(comment.getContent());
+                //commentResponse.setParentCommentId(comment.getParentComment().getCommentId());
+                commentResponse.setUserId(comment.getUser().getUserId());
+                commentResponse.setUserName(comment.getUser().getUserName());
+
+                commentResponses.add(commentResponse);
+            }
+            postResponse.setComments(commentResponses);
+            postResponse.setLikesCount(post.getLikes().size());
+            postResponses.add(postResponse);
+        }
+        return postResponses;
     }
 
     public Optional<Post> getPostById(Long postId) {
